@@ -1,4 +1,4 @@
-FROM apache/airflow:2.2.3-python3.9
+FROM apache/airflow:2.2.3-python3.8
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -33,4 +33,4 @@ RUN usermod --uid ${USER_ID} airflow \
 USER airflow
 
 COPY requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir --user --requirement ./requirements.txt
+RUN pip install --no-cache-dir --requirement ./requirements.txt

@@ -20,16 +20,20 @@ add-charts:
 	helm repo add nfs https://charts.helm.sh/stable
 	helm repo update
 
-.PHONY: port-forward
-port-forward:
+.PHONY: airflow-forward
+airflow-forward:
 	kubectl port-forward svc/${RELEASE_NAME}-airflow-webserver 8080:8080 \
-		--namespace ${NAMESPACE} >> /dev/null &
+		--namespace ${NAMESPACE}
+
+.PHONY: spark-forward
+spark-forward:
 	kubectl port-forward svc/${RELEASE_NAME}-spark-master-svc 8088:80 \
-		--namespace ${NAMESPACE} >> /dev/null &
+       --namespace ${NAMESPACE}
 
 .PHONY: helm-init
 helm-init:
-	helm install ${RELEASE_NAME}-airflow apache-airflow/airflow --namespace ${NAMESPACE}
+	helm install ${RELEASE_NAME}-airflow apache-airflow/airflow \
+		--namespace ${NAMESPACE}
 	helm install ${RELEASE_NAME}-nfs nfs/nfs-server-provisioner \
   		--set persistence.enabled=true,persistence.size=5Gi \
 		--namespace ${NAMESPACE}
@@ -44,7 +48,33 @@ airflow-release:
 	kind load docker-image ifood-airflow:${VERSION} --name ${CLUSTER_NAME}
 	helm upgrade ${RELEASE_NAME}-airflow apache-airflow/airflow \
 		--namespace ${NAMESPACE} \
-		--values templates/airflow/airflow-chart.yaml
+		--values templates/airflow/airflow-chart.yaml \
+		--set images.airflow.repository=ifood-airflow \
+    	--set images.airflow.tag=${VERSION}
+
+.PHONY: spark-release
+spark-release:
+	docker build --tag ifood-spark:${VERSION} spark
+	kind load docker-image ifood-spark:${VERSION} --name ${CLUSTER_NAME}
+	helm upgrade ${RELEASE_NAME}-spark bitnami/spark \
+		--namespace ${NAMESPACE} \
+		--values templates/spark/spark-chart.yaml \
+		--set image.repository=ifood-spark \
+    	--set image.tag=${VERSION}
+
+.PHONY: update
+update:
+	kubectl exec \
+		-it ${RELEASE_NAME}-airflow-worker-0 \
+		--container worker \
+		--namespace ${NAMESPACE} \
+		-- rm -rf /opt/airflow/dags /spark/src
+	kubectl cp airflow/dags ${RELEASE_NAME}-airflow-worker-0:/opt/airflow \
+		--namespace ${NAMESPACE} \
+		--container worker
+	kubectl cp spark/src ${RELEASE_NAME}-airflow-worker-0:/spark \
+		--namespace ${NAMESPACE} \
+		--container worker
 
 .PHONY: clear
 clear:

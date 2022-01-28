@@ -1,2 +1,1 @@
-delta-spark==1.1.0
-pyspark==3.2.0
+apache-airflow-providers-apache-spark==2.0.3
