@@ -27,9 +27,6 @@ RUN curl -O https://ftp.unicamp.br/pub/apache/spark/spark-3.2.0/spark-3.2.0-bin-
     && rm -rf spark-3.2.0-bin-hadoop3.2.tgz \
     && mv spark-3.2.0-bin-hadoop3.2 ${SPARK_HOME}
 
-COPY include ./include
-COPY dags ./dags
-
 RUN usermod --uid ${USER_ID} airflow \
     && chown --recursive airflow ${AIRFLOW_HOME}
 
