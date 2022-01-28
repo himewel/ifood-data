@@ -17,21 +17,26 @@ create-namespace:
 add-charts:
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo add apache-airflow https://airflow.apache.org
-	helm repo add stable https://charts.helm.sh/stable
+	helm repo add nfs https://charts.helm.sh/stable
 	helm repo update
 
 .PHONY: port-forward
 port-forward:
-	kubectl port-forward svc/${AIRFLOW_RELEASE_NAME}-webserver 8080:8080 \
-		--namespace $NAMESPACE 2>&1 &
+	kubectl port-forward svc/${RELEASE_NAME}-airflow-webserver 8080:8080 \
+		--namespace ${NAMESPACE} >> /dev/null &
+	kubectl port-forward svc/${RELEASE_NAME}-spark-master-svc 8088:80 \
+		--namespace ${NAMESPACE} >> /dev/null &
 
 .PHONY: helm-init
 helm-init:
 	helm install ${RELEASE_NAME}-airflow apache-airflow/airflow --namespace ${NAMESPACE}
-	helm install ${RELEASE_NAME}-nfs stable/nfs-server-provisioner \
+	helm install ${RELEASE_NAME}-nfs nfs/nfs-server-provisioner \
   		--set persistence.enabled=true,persistence.size=5Gi \
 		--namespace ${NAMESPACE}
 	kubectl apply -f templates/nfs -n ${NAMESPACE}
+	helm install ${RELEASE_NAME}-spark bitnami/spark \
+		--values templates/spark/spark-chart.yaml \
+		--namespace ${NAMESPACE}
 
 .PHONY: airflow-release
 airflow-release:
