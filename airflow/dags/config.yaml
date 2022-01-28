@@ -1,0 +1,22 @@
+topics:
+    covid19:
+        start-date: 2022-01-10T00:00:00-03
+        schedule-interval: "*/15 * * * *"
+        max-results: 50
+        landing-path: /data/landing
+        raw-path: /data/raw
+        trusted-path: /data/trusted
+    python:
+        start-date: 2022-01-10T00:00:00-03
+        schedule-interval: "*/15 * * * *"
+        max-results: 100
+        landing-path: /data/landing
+        raw-path: /data/raw
+        trusted-path: /data/trusted
+    bbb:
+        start-date: 2022-01-10T00:00:00-03
+        schedule-interval: "*/15 * * * *"
+        max-results: 100
+        landing-path: /data/landing
+        raw-path: /data/raw
+        trusted-path: /data/trusted

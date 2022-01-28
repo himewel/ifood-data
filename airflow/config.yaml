@@ -1,0 +1,5 @@
+images:
+    airflow:
+        repository: ifood-airflow
+        tag: 0.0.1
+webserverSecretKey: Q0haS0p1ZUxoaEUwY0xzeER4VTVJU0lWYk50TW9jSEs=
