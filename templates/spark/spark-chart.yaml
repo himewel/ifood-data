@@ -1,0 +1,11 @@
+service:
+  type: LoadBalancer
+worker:
+  replicaCount: 2
+  extraVolumes:
+    - name: spark-code
+      persistentVolumeClaim:
+        claimName: spark-pvc
+  extraVolumeMounts:
+    - name: spark-code
+      mountPath: /spark

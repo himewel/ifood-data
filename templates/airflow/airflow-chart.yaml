@@ -1,0 +1,36 @@
+airflowVersion: 2.2.3
+scheduler:
+  extraVolumes:
+    - name: spark-code
+      persistentVolumeClaim:
+        claimName: spark-pvc
+    - name: airflow-code
+      persistentVolumeClaim:
+        claimName: airflow-pvc
+  extraVolumeMounts:
+    - name: spark-code
+      mountPath: /spark
+    - name: airflow-code
+      mountPath: /opt/airflow
+webserver:
+  extraVolumes:
+    - name: airflow-code
+      persistentVolumeClaim:
+        claimName: airflow-pvc
+  extraVolumeMounts:
+    - name: airflow-code
+      mountPath: /opt/airflow
+workers:
+  extraVolumes:
+    - name: spark-code
+      persistentVolumeClaim:
+        claimName: spark-pvc
+    - name: airflow-code
+      persistentVolumeClaim:
+        claimName: airflow-pvc
+  extraVolumeMounts:
+    - name: spark-code
+      mountPath: /spark
+    - name: airflow-code
+      mountPath: /opt/airflow
+webserverSecretKey: Q0haS0p1ZUxoaEUwY0xzeER4VTVJU0lWYk50TW9jSEs=
