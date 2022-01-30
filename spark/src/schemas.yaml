@@ -1,0 +1,49 @@
+orders:
+    cpf: string
+    customer_id: long
+    customer_name: string
+    delivery_address_city: string
+    delivery_address_country: string
+    delivery_address_district: string
+    delivery_address_external_id: long
+    delivery_address_latitude: long
+    delivery_address_longitude: long
+    delivery_address_state: string
+    delivery_address_zip_code: string
+    items: string
+    merchant_id: long
+    merchant_latitude: long
+    merchant_longitude: long
+    merchant_timezone: string
+    order_created_at: timestamp
+    order_id: long
+    order_scheduled: boolean
+    order_scheduled_date: timestamp
+    order_total_amount: double
+    origin_platform: string
+order_statuses:
+    created_at: timestamp
+    order_id: long
+    status_id: long
+    value: string
+restaurants:
+    id: long
+    created_at: timestamp
+    enabled: boolean
+    price_range: string
+    average_ticket: double
+    takeout_time: timestamp
+    delivery_time: timestamp
+    minimum_order_value: double
+    merchant_zip_code: string
+    merchant_city: string
+    merchant_state: string
+    merchant_country: string
+consumers:
+    customer_id: long
+    language: string
+    created_at: timestamp
+    active: boolean
+    customer_name: string
+    customer_phone_area: string
+    customer_phone_number: string
