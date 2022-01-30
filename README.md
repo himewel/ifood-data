@@ -1,4 +1,4 @@
-# Ifood Data Architect Test
+# Ifood Data
 
 This project process semi-structured data and build a datalake that provides efficient storage and performance. The datalake is organized in the following 2 layers:
 - *raw layer*: datasets must have the same schema as the source, but support fast structured data reading
@@ -21,3 +21,57 @@ performance, watch out for small files and skewed data.
 
 - Data volume increases each day.
 - All ETLs must be built to be scalable.
+
+## How to start
+
+First of all, install the following softwares to reproduce this project:
+- [kind](https://kind.sigs.k8s.io/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [helm](https://helm.sh/)
+- [docker](https://www.docker.com/)
+
+So, you can init the kubernetes environment with Airflow and Spark in the following commands:
+
+```shell
+make create-cluster
+make create-namespace
+make add-charts
+make helm-init
+```
+
+To forward the Airflow Web UI to your browser, open another terminal and run:
+
+```shell
+make airflow-forward
+```
+
+To forward the Spark Web UI to your browser, open another terminal and run:
+
+```shell
+make spark-forward
+```
+
+To release the Airflow or Spark images of this project, run the release targets with a VERSION as parameter:
+
+```shell
+make airflow-release VERSION=0.0.1
+make spark-release VERSION=0.0.1
+```
+
+To update the code files in the kubernetes environment, run the following:
+
+```shell
+make update
+```
+
+To wrap all these commands and start your first version, just run:
+
+```shell
+make all
+```        
+
+To clear your environment and remove the kubernetes cluster, run the following:
+
+```shell
+make clear
+```

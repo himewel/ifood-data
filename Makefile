@@ -2,6 +2,7 @@ SHELL:=/bin/bash
 CLUSTER_NAME=ifood-cluster
 NAMESPACE=ifood-cluster
 RELEASE_NAME=ifood
+VERSION=0.0.1
 
 .PHONY: create-cluster
 create-cluster:
@@ -68,13 +69,16 @@ update:
 		-it ${RELEASE_NAME}-airflow-worker-0 \
 		--container worker \
 		--namespace ${NAMESPACE} \
-		-- rm -rf /opt/airflow/dags /spark/src
+		-- rm -rf /opt/airflow/dags/* /spark/*
 	kubectl cp airflow/dags ${RELEASE_NAME}-airflow-worker-0:/opt/airflow \
 		--namespace ${NAMESPACE} \
 		--container worker
 	kubectl cp spark/src ${RELEASE_NAME}-airflow-worker-0:/spark \
 		--namespace ${NAMESPACE} \
 		--container worker
+
+.PHONY: all
+all: create-cluster create-namespace add-charts helm-init airflow-release spark-release update
 
 .PHONY: clear
 clear:

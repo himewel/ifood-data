@@ -1,4 +1,7 @@
 airflowVersion: 2.2.3
+env:
+  - name: AIRFLOW_CONN_SPARK_DEFAULT
+    value: "spark://spark%3A%2F%2Fifood-spark-master-svc:7077"
 scheduler:
   extraVolumes:
     - name: spark-code
@@ -11,7 +14,7 @@ scheduler:
     - name: spark-code
       mountPath: /spark
     - name: airflow-code
-      mountPath: /opt/airflow
+      mountPath: /opt/airflow/dags
 webserver:
   extraVolumes:
     - name: airflow-code
@@ -19,7 +22,7 @@ webserver:
         claimName: airflow-pvc
   extraVolumeMounts:
     - name: airflow-code
-      mountPath: /opt/airflow
+      mountPath: /opt/airflow/dags
 workers:
   extraVolumes:
     - name: spark-code
@@ -32,5 +35,5 @@ workers:
     - name: spark-code
       mountPath: /spark
     - name: airflow-code
-      mountPath: /opt/airflow
+      mountPath: /opt/airflow/dags
 webserverSecretKey: Q0haS0p1ZUxoaEUwY0xzeER4VTVJU0lWYk50TW9jSEs=
