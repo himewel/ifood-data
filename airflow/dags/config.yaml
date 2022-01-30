@@ -1,0 +1,38 @@
+data:
+    orders:
+        source: "s3a://ifood-data-architect-test-source/orders"
+        format: "json"
+        id_columns:
+            - "customer_id"
+            - "delivery_address_external_id"
+            - "merchant_id"
+            - "order_id"
+        partition_column: "order_scheduled_date"
+    order_statuses:
+        source: "s3a://ifood-data-architect-test-source/status.json.gz"
+        format: "json"
+        id_columns:
+            - "order_id"
+            - "status_id"
+        partition_column: "created_at"
+    restaurants:
+        source: "s3a://ifood-data-architect-test-source/restaurant.csv.gz"
+        format: "csv"
+        id_columns:
+            - "id"
+        partition_column: "created_at"
+    consumers:
+        source: "s3a://ifood-data-architect-test-source/consumer.csv.gz"
+        format: "csv"
+        id_columns:
+            - "customer_id"
+        partition_column: "created_at"
+spark:
+    total_executor_cores: 1
+    conf:
+        spark.sql.extensions: "io.delta.sql.DeltaSparkSessionExtension"
+        spark.sql.catalog.spark_catalog: "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+    packages:
+        - "com.amazonaws:aws-java-sdk:1.11.956"
+        - "org.apache.hadoop:hadoop-aws:3.2.2"
+        - "io.delta:delta-core_2.12:1.1.0"

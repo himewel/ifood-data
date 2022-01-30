@@ -1,8 +1,5 @@
 FROM apache/airflow:2.2.3-python3.8
 
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-
 ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
 ENV SPARK_HOME "/opt/spark"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
@@ -27,7 +24,7 @@ RUN curl -O https://ftp.unicamp.br/pub/apache/spark/spark-3.2.0/spark-3.2.0-bin-
     && rm -rf spark-3.2.0-bin-hadoop3.2.tgz \
     && mv spark-3.2.0-bin-hadoop3.2 ${SPARK_HOME}
 
-RUN usermod --uid ${USER_ID} airflow \
+RUN usermod --uid 1000 airflow \
     && chown --recursive airflow ${AIRFLOW_HOME}
 
 USER airflow

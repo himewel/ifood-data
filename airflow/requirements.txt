@@ -1,1 +1,2 @@
 apache-airflow-providers-apache-spark==2.0.3
+delta-spark==1.1.0
