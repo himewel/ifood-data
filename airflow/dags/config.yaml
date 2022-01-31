@@ -3,11 +3,8 @@ data:
         source: "s3a://ifood-data-architect-test-source/orders"
         format: "json"
         id_columns:
-            - "customer_id"
-            - "delivery_address_external_id"
-            - "merchant_id"
             - "order_id"
-        partition_column: "order_scheduled_date"
+        partition_column: "order_created_at"
     order_statuses:
         source: "s3a://ifood-data-architect-test-source/status.json.gz"
         format: "json"
