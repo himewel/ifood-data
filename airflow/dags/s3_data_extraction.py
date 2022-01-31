@@ -25,6 +25,7 @@ with DAG(
     spark_packages = config["spark"]["packages"]
     spark_total_executor_cores = config["spark"]["total_executor_cores"]
 
+    raw_tasks = []
     for schema, params in config["data"].items():
         task = SparkSubmitOperator(
             application="/spark/src/extract_from_s3.py",
@@ -36,7 +37,19 @@ with DAG(
                 params["partition_column"],
             ],
             conf=spark_conf,
-            total_executor_cores=spark_total_executor_cores,
+            total_executor_cores=2
+            if schema == "orders"
+            else spark_total_executor_cores,
             task_id=f"raw_{schema}",
             packages=",".join(spark_packages),
         )
+        raw_tasks.append(task)
+
+    orders_datamart_task = SparkSubmitOperator(
+        application="/spark/src/orders_datamart.py",
+        conf=spark_conf,
+        total_executor_cores=spark_total_executor_cores,
+        task_id="trusted_orders",
+        packages=",".join(spark_packages),
+    )
+    raw_tasks >> orders_datamart_task
