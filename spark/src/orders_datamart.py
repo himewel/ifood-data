@@ -71,13 +71,15 @@ def transform():
         orders.withColumn(
             "order_created_at",
             to_timestamp(
-                convert_datetime(col("order_created_at"), col("merchant_timezone"))
+                convert_datetime(
+                    col("order_created_at"),
+                    col("merchant_timezone"),
+                )
             ),
         )
         .withColumn("year_partition", date_format(col("order_created_at"), "yyyy"))
         .withColumn("month_partition", date_format(col("order_created_at"), "MM"))
         .withColumn("day_partition", date_format(col("order_created_at"), "dd"))
-        .withColumn("hour_partition", date_format(col("order_created_at"), "HH"))
     )
 
     if DeltaTable.isDeltaTable(spark, trusted_path):
@@ -96,12 +98,7 @@ def transform():
         _ = (
             orders.write.format("delta")
             .mode("overwrite")
-            .partitionBy(
-                "year_partition",
-                "month_partition",
-                "day_partition",
-                "hour_partition",
-            )
+            .partitionBy("year_partition", "month_partition", "day_partition")
             .save(trusted_path)
         )
 
