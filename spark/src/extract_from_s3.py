@@ -1,8 +1,13 @@
 from sys import argv
 
-from delta import DeltaTable
-from pyspark.sql.functions import col, date_format, monotonically_increasing_id
 import yaml
+from delta import DeltaTable
+from pyspark.sql.functions import (
+    col,
+    date_format,
+    from_json,
+    monotonically_increasing_id,
+)
 
 from utils import get_spark
 
@@ -16,7 +21,10 @@ def get_schemas():
 def apply_dtypes(df, schema):
     dtypes = get_schemas()[schema]
     for column, dtype in dtypes.items():
-        df = df.withColumn(column, col(column).cast(dtype))
+        if "\n" in dtype:
+            df = df.withColumn(column, from_json(col(column), dtype))
+        else:
+            df = df.withColumn(column, col(column).cast(dtype))
     return df
 
 
