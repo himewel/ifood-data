@@ -123,3 +123,11 @@ Both Apache Airflow and Apache Spark environments are deployed in Kubernetes usi
 Two DAGs are created to orchestrate the ETL jobs: *ifood-ingestion* and *ifood-datamart*. The DAG *ifood-ingestion* is responsible for the ingestion of `s3://ifood-data-architecture-source` files to the raw layer and make sure that each row was ingested to the data lake stored in `s3://ifood-lake/raw`. Then, the DAG *ifood-datamart* gets data from the raw layer and creates the specified datamarts. Both DAGs are scheduled to run yearly by default, besides each job could be configured to run with any schedule. Raw and trusted layers are writed with Delta Lake format in upsert mode.
 
 The folder `airflow/` keeps the Apache Airflow Dockerfile, DAG files and other requirements to be deployed in Kubernetes. A similar pattern is used in the `spark/` folder, where the PySpark script are placed with a Dockerfile and their requirements. In `templates/` the Helm chart configs and other pod declarations are stored.
+
+<p align="center">
+<img alt="ifood-ingestion" src="/docs/ifood-ingestion.png"/>
+</p>
+
+<p align="center">
+<img alt="ifood-datamart" src="/docs/ifood-datamart.png"/>
+</p>
