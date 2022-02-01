@@ -1,8 +1,19 @@
+import logging
+from datetime import datetime
 from sys import argv
 
 from delta import DeltaTable
 from pyspark.sql.window import Window
-from pyspark.sql.functions import col, date_format, rank, struct, to_timestamp
+from pyspark.sql.functions import (
+    col,
+    concat,
+    date_format,
+    lit,
+    rank,
+    struct,
+    to_date,
+    to_timestamp,
+)
 
 from utils import get_spark, anonymize_column, convert_datetime
 
@@ -24,17 +35,45 @@ def get_last_statuses(df):
     return df
 
 
-def transform():
+def get_last_order(df):
+    partition = Window.partitionBy(col("order_id")).orderBy(
+        col("order_created_at").desc()
+    )
+    df = (
+        df.withColumn("rank_value", rank().over(partition))
+        .where(col("rank_value") == 1)
+        .drop("rank_value")
+    )
+    return df
+
+
+def transform(start_date, end_date):
     spark = get_spark(app_name="orders-trusted-datamart")
     s3_path = "s3a://ifood-lake"
-    trusted_path = f"{s3_path}/trusted/orders"
+
+    date_partition = to_date(
+        concat(
+            col("year_partition"),
+            lit("-"),
+            col("month_partition"),
+            lit("-"),
+            col("day_partition"),
+        )
+    )
 
     orders = spark.read.format("delta").load(f"{s3_path}/raw/orders")
     consumers = spark.read.format("delta").load(f"{s3_path}/raw/consumers")
     restaurants = spark.read.format("delta").load(f"{s3_path}/raw/restaurants")
-    order_statuses = spark.read.format("delta").load(f"{s3_path}/raw/order_statuses")
+    order_statuses = (
+        spark.read.format("delta")
+        .load(f"{s3_path}/raw/order_statuses")
+        .where(
+            (date_partition >= start_date.date()) & (date_partition < end_date.date())
+        )
+    )
 
     order_statuses = get_last_statuses(order_statuses)
+    orders = get_last_order(orders)
 
     orders = (
         orders.alias("orders")
@@ -82,6 +121,7 @@ def transform():
         .withColumn("day_partition", date_format(col("order_created_at"), "dd"))
     )
 
+    trusted_path = f"{s3_path}/trusted/orders"
     if DeltaTable.isDeltaTable(spark, trusted_path):
         trusted_df = DeltaTable.forPath(spark, trusted_path)
         _ = (
@@ -104,4 +144,13 @@ def transform():
 
 
 if __name__ == "__main__":
-    transform()
+    if len(argv) < 3:
+        print("Missing parameters...")
+        exit(1)
+    else:
+        start_date = datetime.strptime(argv[1][:19], "%Y-%m-%dT%H:%M:%S")
+        end_date = datetime.strptime(argv[2][:19], "%Y-%m-%dT%H:%M:%S")
+
+    logging.info(f"start_date {start_date}")
+    logging.info(f"end_date {end_date}")
+    transform(start_date, end_date)
