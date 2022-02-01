@@ -1,7 +1,7 @@
 service:
   type: LoadBalancer
 worker:
-  replicaCount: 2
+  replicaCount: 3
   extraVolumes:
     - name: spark-code
       persistentVolumeClaim:
