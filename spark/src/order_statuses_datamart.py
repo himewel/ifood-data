@@ -6,6 +6,7 @@ from delta import DeltaTable
 from pyspark.sql.functions import (
     coalesce,
     col,
+    collect_list,
     concat,
     date_format,
     lit,
@@ -16,9 +17,7 @@ from pyspark.sql.functions import (
 from utils import get_spark
 
 
-def transform(start_date, end_date):
-    spark = get_spark(app_name="order-statuses-trusted-datamart")
-
+def get_date_partition():
     date_partition = to_date(
         concat(
             col("year_partition"),
@@ -28,63 +27,48 @@ def transform(start_date, end_date):
             col("day_partition"),
         )
     )
+    return date_partition
+
+
+def transform(start_date, end_date):
+    spark = get_spark(app_name="order-statuses-trusted-datamart")
+
     statuses = (
         spark.read.format("delta")
         .load("s3a://ifood-lake/raw/order_statuses")
-        .where(
-            (date_partition >= start_date.date()) & (date_partition < end_date.date())
-        )
+        .where(get_date_partition() >= start_date.date())
+        .where(get_date_partition() < end_date.date())
     )
 
-    values = ["concluded", "registered", "cacelled", "placed"]
-    orders = statuses.select("order_id").distinct().alias("orders")
-    for status in values:
-        status_value = statuses.where(col("value") == status.upper()).select(
-            "order_id", "created_at"
+    statuses = (
+        statuses.select(
+            col("order_id"),
+            struct(
+                col("value").alias("event"),
+                col("created_at"),
+            ).alias("status"),
         )
-        orders = (
-            orders.join(
-                other=status_value.alias(status),
-                on=col("orders.order_id") == col(f"{status}.order_id"),
-                how="left",
-            )
-            .withColumn(f"{status}_timestamp", col(f"{status}.created_at"))
-            .drop(f"{status}.*")
-        )
-
-    timestamp_columns = [f"{status}_timestamp" for status in values]
-    date_partition = coalesce(*timestamp_columns).alias("date_partition")
-    orders = (
-        orders.select("orders.order_id", *timestamp_columns)
-        .withColumn("year_partition", date_format(date_partition, "yyyy"))
-        .withColumn("month_partition", date_format(date_partition, "MM"))
-        .withColumn("day_partition", date_format(date_partition, "dd"))
+        .groupBy("order_id")
+        .agg(collect_list("status").alias("status"))
     )
+    statuses.printSchema()
 
     trusted_path = "s3a://ifood-lake/trusted/order_statuses"
     if DeltaTable.isDeltaTable(spark, trusted_path):
         trusted_df = DeltaTable.forPath(spark, trusted_path)
-        for status in values:
-            status_orders = orders.where(col(f"{status}_timestamp").isNotNull())
-            _ = (
-                trusted_df.alias("trusted")
-                .merge(
-                    source=status_orders.alias("orders"),
-                    condition=col("trusted.order_id") == col("orders.order_id"),
-                )
-                .whenMatchedUpdate(
-                    set={f"{status}_timestamp": f"orders.{status}_timestamp"}
-                )
-                .whenNotMatchedInsertAll()
-                .execute()
-            )
-    else:
+        trusted_df.printSchema()
         _ = (
-            orders.write.format("delta")
-            .partitionBy("year_partition", "month_partition", "day_partition")
-            .mode("overwrite")
-            .save(trusted_path)
+            trusted_df.alias("trusted")
+            .merge(
+                source=statuses.alias("orders"),
+                condition=col("trusted.order_id") == col("orders.order_id"),
+            )
+            .whenMatchedUpdateAll()
+            .whenNotMatchedInsertAll()
+            .execute()
         )
+    else:
+        _ = statuses.write.format("delta").mode("overwrite").save(trusted_path)
 
 
 if __name__ == "__main__":
