@@ -4,6 +4,7 @@ data:
         format: "json"
         id_columns:
             - "order_id"
+            - "order_created_at"
         partition_column: "order_created_at"
     order_statuses:
         source: "s3a://ifood-data-architect-test-source/status.json.gz"
@@ -11,6 +12,7 @@ data:
         id_columns:
             - "order_id"
             - "status_id"
+            - "created_at"
         partition_column: "created_at"
     restaurants:
         source: "s3a://ifood-data-architect-test-source/restaurant.csv.gz"
@@ -29,6 +31,10 @@ spark:
     conf:
         spark.sql.extensions: "io.delta.sql.DeltaSparkSessionExtension"
         spark.sql.catalog.spark_catalog: "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        spark.databricks.delta.properties.defaults.autoOptimize.optimizeWrite: "true"
+        spark.databricks.delta.properties.defaults.autoOptimize.autoCompact: "true"
+        spark.databricks.delta.optimizeWrite.enabled: "true"
+        spark.databricks.delta.autoCompact.enabled: "true"
     packages:
         - "com.amazonaws:aws-java-sdk:1.11.956"
         - "org.apache.hadoop:hadoop-aws:3.2.2"
