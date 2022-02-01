@@ -5,9 +5,33 @@ import pendulum
 
 
 def get_spark(app_name):
-    builder = SparkSession.builder.appName(app_name).config(
-        "fs.s3a.aws.credentials.provider",
-        "com.amazonaws.auth.EnvironmentVariableCredentialsProvider",
+    builder = (
+        SparkSession.builder.appName(app_name)
+        .config(
+            "fs.s3a.aws.credentials.provider",
+            "com.amazonaws.auth.EnvironmentVariableCredentialsProvider",
+        )
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        .config(
+            "spark.sql.catalog.spark_catalog",
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+        )
+        .config(
+            "spark.databricks.delta.properties.defaults.autoOptimize.optimizeWrite",
+            "true",
+        )
+        .config(
+            "spark.databricks.delta.properties.defaults.autoOptimize.autoCompact",
+            "true",
+        )
+        .config(
+            "spark.databricks.delta.optimizeWrite.enabled",
+            "true",
+        )
+        .config(
+            "spark.databricks.delta.autoCompact.enabled",
+            "true",
+        )
     )
     spark = configure_spark_with_delta_pip(builder).getOrCreate()
     return spark
