@@ -69,7 +69,7 @@ update:
 		-it ${RELEASE_NAME}-airflow-worker-0 \
 		--container worker \
 		--namespace ${NAMESPACE} \
-		-- rm -rf /opt/airflow/dags/* /spark/*
+		-- bash -c 'rm -rf /opt/airflow/dags/* /spark/*'
 	kubectl cp airflow/dags ${RELEASE_NAME}-airflow-worker-0:/opt/airflow \
 		--namespace ${NAMESPACE} \
 		--container worker
