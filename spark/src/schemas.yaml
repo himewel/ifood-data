@@ -1,110 +1,110 @@
 orders:
-    cpf: string
-    customer_id: string
-    customer_name: string
-    delivery_address_city: string
-    delivery_address_country: string
-    delivery_address_district: string
-    delivery_address_external_id: string
-    delivery_address_latitude: long
-    delivery_address_longitude: long
-    delivery_address_state: string
-    delivery_address_zip_code: string
-    items: |
-        ARRAY<
-            STRUCT<
-                `name`: STRING,
-                `addition`: STRUCT<
-                    `value`: STRING,
-                    `currency`: STRING
-                >,
-                `discount`: STRUCT<
-                    `value`: STRING,
-                    `currency`: STRING
-                >,
-                `quantity`: DOUBLE,
-                `sequence`: INT,
-                `unitPrice`: STRUCT<
-                    `value`: STRING,
-                    `currency`: STRING
-                >,
-                `externalId`: STRING,
-                `totalValue`: STRUCT<
-                    `value`: STRING,
-                    `currency`: STRING
-                >,
-                `customerNote`: STRING,
-                `garnishItems`: ARRAY<
-                    STRUCT<
-                        `name`: STRING,
-                        `addition`: STRUCT<
-                            `value`: STRING,
-                            `currency`: STRING
-                        >,
-                        `discount`: STRUCT<
-                            `value`: STRING,
-                            `currency`: STRING
-                        >,
-                        `quantity`: DOUBLE,
-                        `sequence`: INT,
-                        `unitPrice`: STRUCT<
-                            `value`: STRING,
-                            `currency`: STRING
-                        >,
-                        `categoryId`: STRING,
-                        `externalId`: STRING,
-                        `totalValue`: STRUCT<
-                            `value`: STRING,
-                            `currency`: STRING
-                        >,
-                        `categoryName`: STRING,
-                        `integrationId`: STRING
-                    >
-                >,
-                `integrationId`: STRING,
-                `totalAddition`: STRUCT<
-                    `value`: STRING,
-                    `currency`: STRING
-                >,
-                `totalDiscount`: STRUCT<
-                    `value`: STRING,
-                    `currency`: STRING
-                >
-            >
+  cpf: string
+  customer_id: string
+  customer_name: string
+  delivery_address_city: string
+  delivery_address_country: string
+  delivery_address_district: string
+  delivery_address_external_id: string
+  delivery_address_latitude: long
+  delivery_address_longitude: long
+  delivery_address_state: string
+  delivery_address_zip_code: string
+  items: |
+    ARRAY<
+      STRUCT<
+        `name`: STRING,
+        `addition`: STRUCT<
+          `value`: STRING,
+          `currency`: STRING
+        >,
+        `discount`: STRUCT<
+          `value`: STRING,
+          `currency`: STRING
+        >,
+        `quantity`: DOUBLE,
+        `sequence`: INT,
+        `unitPrice`: STRUCT<
+          `value`: STRING,
+          `currency`: STRING
+        >,
+        `externalId`: STRING,
+        `totalValue`: STRUCT<
+          `value`: STRING,
+          `currency`: STRING
+        >,
+        `customerNote`: STRING,
+        `garnishItems`: ARRAY<
+          STRUCT<
+            `name`: STRING,
+            `addition`: STRUCT<
+              `value`: STRING,
+              `currency`: STRING
+            >,
+            `discount`: STRUCT<
+              `value`: STRING,
+              `currency`: STRING
+            >,
+            `quantity`: DOUBLE,
+            `sequence`: INT,
+            `unitPrice`: STRUCT<
+              `value`: STRING,
+              `currency`: STRING
+            >,
+            `categoryId`: STRING,
+            `externalId`: STRING,
+            `totalValue`: STRUCT<
+              `value`: STRING,
+              `currency`: STRING
+            >,
+            `categoryName`: STRING,
+            `integrationId`: STRING
+          >
+        >,
+        `integrationId`: STRING,
+        `totalAddition`: STRUCT<
+          `value`: STRING,
+          `currency`: STRING
+        >,
+        `totalDiscount`: STRUCT<
+          `value`: STRING,
+          `currency`: STRING
         >
-    merchant_id: string
-    merchant_latitude: long
-    merchant_longitude: long
-    merchant_timezone: string
-    order_created_at: timestamp
-    order_id: string
-    order_scheduled: boolean
-    order_scheduled_date: timestamp
-    order_total_amount: double
-    origin_platform: string
+      >
+    >
+  merchant_id: string
+  merchant_latitude: long
+  merchant_longitude: long
+  merchant_timezone: string
+  order_created_at: timestamp
+  order_id: string
+  order_scheduled: boolean
+  order_scheduled_date: timestamp
+  order_total_amount: double
+  origin_platform: string
 order_statuses:
-    created_at: timestamp
-    order_id: string
-    status_id: string
-    value: string
+  created_at: timestamp
+  order_id: string
+  status_id: string
+  value: string
 restaurants:
-    id: string
-    created_at: timestamp
-    enabled: boolean
-    price_range: string
-    average_ticket: double
-    takeout_time: string
-    delivery_time: string
-    minimum_order_value: double
-    merchant_zip_code: string
-    merchant_city: string
-    merchant_state: string
-    merchant_country: string
+  id: string
+  created_at: timestamp
+  enabled: boolean
+  price_range: string
+  average_ticket: double
+  takeout_time: string
+  delivery_time: string
+  minimum_order_value: double
+  merchant_zip_code: string
+  merchant_city: string
+  merchant_state: string
+  merchant_country: string
 consumers:
-    customer_id: string
-    language: string
-    created_at: timestamp
-    active: boolean
-    customer_name: string
-    customer_phone_area: string
-    customer_phone_number: string
+  customer_id: string
+  language: string
+  created_at: timestamp
+  active: boolean
+  customer_name: string
+  customer_phone_area: string
+  customer_phone_number: string
