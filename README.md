@@ -131,3 +131,7 @@ The folder `airflow/` keeps the Apache Airflow Dockerfile, DAG files and other r
 <p align="center">
 <img alt="ifood-datamart" src="/docs/ifood-datamart.png"/>
 </p>
+
+<p align="center">
+<img alt="spark-ui" src="/docs/spark-ui.png"/>
+</p>
