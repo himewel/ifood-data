@@ -10,6 +10,7 @@ from pyspark.sql.functions import (
     concat,
     date_format,
     lit,
+    min,
     struct,
     to_date,
 )
@@ -49,14 +50,19 @@ def transform(start_date, end_date):
             ).alias("status"),
         )
         .groupBy("order_id")
-        .agg(collect_list("status").alias("status"))
+        .agg(
+            collect_list("status").alias("status"),
+            min(col("status.created_at")).alias("date_partition"),
+        )
+        .withColumn("year_partition", date_format(col("date_partition"), "yyyy"))
+        .withColumn("month_partition", date_format(col("date_partition"), "MM"))
+        .withColumn("day_partition", date_format(col("date_partition"), "dd"))
     )
     statuses.printSchema()
 
     trusted_path = "s3a://ifood-lake/trusted/order_statuses"
     if DeltaTable.isDeltaTable(spark, trusted_path):
         trusted_df = DeltaTable.forPath(spark, trusted_path)
-        trusted_df.printSchema()
         _ = (
             trusted_df.alias("trusted")
             .merge(
@@ -68,7 +74,12 @@ def transform(start_date, end_date):
             .execute()
         )
     else:
-        _ = statuses.write.format("delta").mode("overwrite").save(trusted_path)
+        _ = (
+            statuses.write.format("delta")
+            .mode("overwrite")
+            .partitionBy("year_partition", "month_partition", "day_partition")
+            .save(trusted_path)
+        )
 
 
 if __name__ == "__main__":
