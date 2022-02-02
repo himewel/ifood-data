@@ -120,6 +120,10 @@ def extract_from_s3(
     )
 
     df.printSchema()
+    if df.count() == 0:
+        logging.info("Dataframe is empty")
+        return
+
     df = df.drop_duplicates(id_columns + [partition_column])
 
     raw_path = f"s3a://ifood-lake/raw/{schema}"
